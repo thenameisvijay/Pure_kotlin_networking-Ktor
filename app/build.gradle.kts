@@ -1,5 +1,3 @@
-import com.android.tools.build.jetifier.core.utils.Log.e
-
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -30,8 +28,6 @@ android {
         buildConfigString("SUB_URL_HEAD", subUrlHead)
 
     }
-
-
 
     buildTypes {
         release {
@@ -80,13 +76,17 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
     implementation("android.arch.lifecycle:extensions:1.1.1")
 
-
     //Hilt
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
 
     //Picasso
     implementation("com.squareup.picasso:picasso:2.71828")
+
+    //testing
+    implementation("androidx.test:monitor:1.4.0")
+    implementation("androidx.test.ext:junit-ktx:1.1.3")
+    testImplementation("junit:junit:4.13.2")
 
 }
 
