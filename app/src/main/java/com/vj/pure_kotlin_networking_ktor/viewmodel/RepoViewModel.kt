@@ -1,7 +1,5 @@
 package com.vj.pure_kotlin_networking_ktor.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vj.pure_kotlin_networking_ktor.model.GitRepository
@@ -14,18 +12,18 @@ import javax.inject.Inject
 @HiltViewModel
 class RepoViewModel @Inject constructor(private val gitRepository: GitRepository) : ViewModel() {
 
-    private val _apiStateFlow: MutableLiveData<ApiCallState> = MutableLiveData(ApiCallState.Empty)
-    val apiStateFlow: LiveData<ApiCallState> = _apiStateFlow
+    private val mutableStateFlow: MutableStateFlow<ApiCallState> = MutableStateFlow(ApiCallState.Empty)
+    val apiStateFlow: StateFlow<ApiCallState> = mutableStateFlow
 
     fun getRepoData() = viewModelScope.launch {
         gitRepository.getRepoData()
             .onStart {
-                _apiStateFlow.value = ApiCallState.Loading
+                mutableStateFlow.value = ApiCallState.Loading
             }
             .catch { e ->
-                _apiStateFlow.value = ApiCallState.Failure(e)
+                mutableStateFlow.value = ApiCallState.Failure(e)
             }.collect { response ->
-                _apiStateFlow.value = ApiCallState.Success(response)
+                mutableStateFlow.value = ApiCallState.Success(response)
             }
     }
 }
