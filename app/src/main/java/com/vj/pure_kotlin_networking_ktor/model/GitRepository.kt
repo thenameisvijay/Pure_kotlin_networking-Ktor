@@ -1,9 +1,15 @@
 package com.vj.pure_kotlin_networking_ktor.model
 
-import com.vj.pure_kotlin_networking_ktor.network.GithubEndPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
-class GitRepository @Inject constructor(private val endPoint: GithubEndPoint) {
-    suspend fun callUserData() = endPoint.requestUserData()
-    suspend fun callUserDetailsData(userName:String) = endPoint.requestUserDetailsData(userName)
+class GitRepository @Inject constructor(private val apiService: ApiService) {
+
+    fun getRepoData() : Flow<ArrayList<RepoResponse>> = flow {
+        emit(apiService.requestUserData())
+    }.flowOn(Dispatchers.IO)
+
 }

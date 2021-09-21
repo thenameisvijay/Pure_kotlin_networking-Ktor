@@ -1,20 +1,24 @@
 package com.vj.pure_kotlin_networking_ktor.di
 
 import android.util.Log
+import com.vj.pure_kotlin_networking_ktor.BuildConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.ktor.client.*
+import io.ktor.client.engine.android.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.logging.*
+import io.ktor.client.request.*
+import io.ktor.client.response.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
-import okhttp3.Protocol.Companion.get
-import okhttp3.Response
-import org.slf4j.event.Level
 import javax.inject.Singleton
 
 @Module
@@ -36,11 +40,6 @@ object AppModule {
                 config {
                     followRedirects(true)
                 }
-//                addInterceptor(CurlInterceptor(Loggable { Log.v("Curl", it) }))
-//                val loggingInterceptor = HttpLoggingInterceptor()
-//                loggingInterceptor.level = LogLevel.BODY
-//                addInterceptor(loggingInterceptor)
-                
                 addNetworkInterceptor(provideHeadersInterceptor())
             }
 
@@ -66,6 +65,11 @@ object AppModule {
                 socketTimeoutMillis = 15000L
             }
 
+            defaultRequest { // this: HttpRequestBuilder ->
+                URLBuilder(BuildConfig.BASE_URL)
+            }
+
+
         }
     }
 
@@ -74,5 +78,23 @@ object AppModule {
         isLenient = true
         encodeDefaults = false
     }
+
+    @Provides
+    @Singleton
+    fun provideKtorInstance(): HttpClient {
+        return HttpClient(Android) {
+            install(DefaultRequest) {
+                headers.append("Content-Type", "application/json")
+            }
+            install(JsonFeature) {
+                serializer = KotlinxSerializer(json)
+            }
+            engine {
+                connectTimeout = 100_000
+                socketTimeout = 100_000
+            }
+        }
+    }
+
 
 }

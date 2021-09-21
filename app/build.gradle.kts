@@ -1,3 +1,5 @@
+import com.android.tools.build.jetifier.core.utils.Log.e
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -17,8 +19,15 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        val BASE_URL = "BASE_URL"
-        buildConfigField("String", "BASE_URL", BASE_URL)
+        val BASE_URL = project.property("BASE_URL") as String
+//        println("KTS "+project.property("BASE_URL"))
+
+        // For build types usage
+        fun com.android.build.api.dsl.BaseFlavor.buildConfigString(name: String, value: String) =
+//            buildConfigField("String", name, "\"$value\"")
+            buildConfigField("String", name, "\"$value\"")
+
+        buildConfigString("BASE_URL", BASE_URL)
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -66,9 +75,10 @@ dependencies {
     //Ktor
     implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
     implementation("io.ktor:ktor-client-json:$ktorVersion")
+    implementation("io.ktor:ktor-client-gson:$ktorVersion")
+    implementation("io.ktor:ktor-client-android:$ktorVersion")
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation( "io.ktor:ktor-client-serialization:$ktorVersion")
-//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
     implementation("io.ktor:ktor-client-logging-jvm:$ktorVersion")
 
     // ViewModel & LiveData
